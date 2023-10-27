@@ -39,4 +39,19 @@ M.toggle = function()
 	end
 end
 
+M.generate_cpp_header = function()
+	local line = vim.fn.getline(".")
+	local match = string.match(line, "([%w%s]+[%*%&]?[%s]+[%w_]+)%(.*%)%s*;%s*$")
+	if match then
+		local definition = string.gsub(match, "%s*;%s*$", "")
+		vim.cmd("normal! o")
+		vim.fn.appendline(definition .. " {")
+		vim.cmd("normal! o")
+		vim.fn.appendline("}")
+		vim.cmd("normal! k")
+	else
+		print("Not a valid C++ function declaration.")
+	end
+end
+
 return M
