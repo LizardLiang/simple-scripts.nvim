@@ -6,6 +6,9 @@ local header_ext = { ".h", ".hpp" }
 M.toggle = function()
 	local filename = vim.fn.expand("%:t:r")
 	local extension = vim.fn.expand("%:e")
+
+	print(filename .. extension)
+
 	if vim.tbl_contains(source_ext, extension) then
 		for _, ext in ipairs(source_ext) do
 			if vim.fn.filereadable(filename .. ext) == 1 then
