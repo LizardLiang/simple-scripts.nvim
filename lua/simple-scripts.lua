@@ -44,10 +44,11 @@ M.generate_cpp_header = function()
 	local match = string.match(line, "([%w%s_:]+[%*%&]?[%s]*[%w_]+)%(.*%)%s*{")
 	if match then
 		local return_type_and_name, params = string.match(line, "([%w%s_:]+[%*%&]?[%s]*[%w_]+)%((.*)%)%s*{")
-		-- Remove the namespace from the function name
+		-- Separate the return type and function name
 		local return_type, func_name_with_namespace =
 			string.match(return_type_and_name, "([%w%s_:]+[%*%&]?[%s]+)([%w_:]+)")
-		local func_name = string.match(func_name_with_namespace, "([^:]+)$")
+		-- Remove the namespace from the function name, if present
+		local func_name = string.match(func_name_with_namespace, "([^:]+)$") or func_name_with_namespace
 		local declaration = return_type .. func_name .. "(" .. params .. ");"
 		local buf = vim.api.nvim_get_current_buf()
 		local row = vim.fn.line(".")
