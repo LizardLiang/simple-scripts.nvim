@@ -40,9 +40,8 @@ M.toggle = function()
 end
 
 M.generate_cpp_header = function()
-	local lines = vim.fn.getline(".", vim.fn.line("'}'"))
-	local definition = table.concat(lines, " ")
-	local match = string.match(definition, "([%w%s]+[%*%&]?[%s]+[%w_]+)%(.*%)%s*{")
+	local line = vim.fn.getline(".")
+	local match = string.match(line, "([%w%s_:]+[%*%&]?[%s]*[%w_]+)%(.*%)%s*{")
 	if match then
 		local declaration = string.gsub(match, "{", ";")
 		vim.cmd("normal! o")
