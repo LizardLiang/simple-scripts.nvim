@@ -43,7 +43,8 @@ M.generate_cpp_header = function()
 	local line = vim.fn.getline(".")
 	local match = string.match(line, "([%w%s_:]+[%*%&]?[%s]*[%w_]+)%(.*%)%s*{")
 	if match then
-		local declaration = string.gsub(match, "{", ";")
+		local return_type_and_name, params = string.match(line, "([%w%s_:]+[%*%&]?[%s]*[%w_]+)%((.*)%)%s*{")
+		local declaration = return_type_and_name .. "(" .. params .. ");"
 		local buf = vim.api.nvim_get_current_buf()
 		local row = vim.fn.line(".")
 		vim.api.nvim_buf_set_lines(buf, row, row, false, { declaration })
