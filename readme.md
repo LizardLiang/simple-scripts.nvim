@@ -31,7 +31,3 @@ This tool is used for generate header declaration for c++ functions
 This tool is used for toggle between header and source file in c++ project
 
 `require('simple-scripts').toggle()`
-
-```
-
-```
