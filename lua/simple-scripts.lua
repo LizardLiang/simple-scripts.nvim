@@ -94,6 +94,7 @@ local function find_function_node()
 
 	local function_node = nil
 	local is_parameter_block = false
+	local is_object_literal = false
 
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col)
 
@@ -106,12 +107,14 @@ local function find_function_node()
 		elseif node_type == "parameter_list" or node_type == "argument_list" then
 			is_parameter_block = true
 			break
+		elseif node_type == "object" then -- Check for object literals in JavaScript
+			is_object_literal = true
 		end
 
 		node = node:parent()
 	end
 
-	return function_node, is_parameter_block
+	return function_node, is_parameter_block, is_object_literal
 end
 
 M.insert_debug_message = function()
@@ -179,7 +182,7 @@ M.insert_debug_message = function()
 	end
 
 	if debug_message ~= "" then
-		local function_node, is_parameter_block = find_function_node()
+		local function_node, is_parameter_block, is_object_literal = find_function_node()
 		local row = vim.fn.line(".")
 		local buf = vim.api.nvim_get_current_buf()
 
@@ -187,7 +190,7 @@ M.insert_debug_message = function()
 			-- Handle the case where the cursor is not inside a function block
 			print("function node")
 
-			if is_parameter_block then
+			if is_parameter_block or is_object_literal then
 				print("is_parameter_block")
 				-- Insert the debug message at the start of the function block
 				local open_brace = vim.fn.search("{", "bcnW")
