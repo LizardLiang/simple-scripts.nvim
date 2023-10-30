@@ -102,6 +102,8 @@ local function find_function_node()
 	while node do
 		local node_type = node:type()
 
+		print(node_type)
+
 		if node_type == "function_definition" or node_type == "method_definition" then
 			function_node = node
 			break
