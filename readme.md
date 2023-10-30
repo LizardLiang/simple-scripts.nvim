@@ -3,6 +3,14 @@
 This script is bunch of scripts that help me with my daily job
 Hope this script will help you too
 
+## Installation
+
+### Lazy
+
+```bash
+use "LizardLiang/simple-scripts.nvim"
+```
+
 ## Features
 
 ### 🚀 Turbo console
@@ -23,3 +31,7 @@ This tool is used for generate header declaration for c++ functions
 This tool is used for toggle between header and source file in c++ project
 
 `require('simple-scripts').toggle()`
+
+```
+
+```
