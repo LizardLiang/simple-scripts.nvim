@@ -231,6 +231,8 @@ M.insert_debug_message = function()
 
 		local start_row, _, end_row, _ = function_node:range()
 
+		print(start_row, end_row)
+
 		if insert_direction == "prepend" then
 			row = start_row
 		else
