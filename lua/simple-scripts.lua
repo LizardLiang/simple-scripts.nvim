@@ -186,26 +186,19 @@ M.insert_debug_message = function()
 		local row = vim.fn.line(".")
 		local buf = vim.api.nvim_get_current_buf()
 
-		if function_node then
-			-- Handle the case where the cursor is not inside a function block
-			print("function node")
+		if is_parameter_block or is_object_literal then
+			print("is_parameter_block")
+			-- Insert the debug message at the start of the function block
+			local open_brace = vim.fn.search("{", "bcnW")
+			local close_brace = vim.fn.search("}", "nW")
 
-			if is_parameter_block or is_object_literal then
-				print("is_parameter_block")
-				-- Insert the debug message at the start of the function block
-				local open_brace = vim.fn.search("{", "bcnW")
-				local close_brace = vim.fn.search("}", "nW")
-
-				if open_brace and close_brace and close_brace > open_brace then
-					row = close_brace
-				end
-			else
-				local start_row, _, end_row, _ = function_node:range()
-				-- Insert the debug message at the end of the function block
-				row = end_row
+			if open_brace and close_brace and close_brace > open_brace then
+				row = close_brace
 			end
 		else
-			print("not function node")
+			local start_row, _, end_row, _ = function_node:range()
+			-- Insert the debug message at the end of the function block
+			row = end_row
 		end
 
 		vim.api.nvim_buf_set_lines(buf, row, row, false, { debug_message })
