@@ -105,7 +105,7 @@ local function find_function_node()
 		local node_type = node:type()
 
 		function_node = node
-		if vim.tbl_contains(prepend_table, node_type) then
+		if vim.tbl_contains(prepend_table, node_type) or string.match(node_type, "statement") then
 			insert_direction = PREPEND
 			break
 		elseif vim.tbl_contains(append_table, node_type) then
