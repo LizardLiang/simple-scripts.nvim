@@ -83,6 +83,13 @@ end
 
 -- Function to find the nearest function block using Tree-sitter
 local function find_function_node()
+	local original_filetype = vim.bo.filetype
+	if original_filetype == "typescriptreact" then
+		vim.bo.filetype = "typescript"
+	elseif original_filetype == "javascriptreact" then
+		vim.bo.filetype = "javascript"
+	end
+
 	local parser = vim.treesitter.get_parser(0, vim.bo.filetype)
 	local tree = parser:parse()[1]
 	local root = tree:root()
