@@ -102,10 +102,8 @@ local function find_function_node()
 	while node do
 		local node_type = node:type()
 
-		if node_type == "function_definition" or node_type == "method_definition" then
-			function_node = node
-			break
-		elseif node_type == "parameter_list" or node_type == "argument_list" then
+		function_node = node
+		if node_type == "parameter_list" or node_type == "argument_list" then
 			is_parameter_block = true
 			break
 		elseif node_type == "object" then -- Check for object literals in JavaScript
@@ -191,7 +189,8 @@ M.insert_debug_message = function()
 		local row = vim.fn.line(".")
 		local buf = vim.api.nvim_get_current_buf()
 
-		if is_parameter_block or is_object_literal or is_function_call then
+		if not function_node then
+		elseif is_parameter_block or is_object_literal or is_function_call then
 			-- Insert the debug message at the start of the function block
 			local open_brace = vim.fn.search("{", "bcnW")
 			local close_brace = vim.fn.search("}", "nW")
