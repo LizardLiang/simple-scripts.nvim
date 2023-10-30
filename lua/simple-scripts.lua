@@ -62,20 +62,33 @@ M.insert_debug_message = function()
 	local filetype = vim.bo.filetype
 	local line_number = vim.fn.line(".")
 	local file_name = vim.fn.expand("%:t")
+	local word_under_cursor = vim.fn.expand("<cword>")
 
 	local debug_message = ""
 
 	if filetype == "javascript" then
-		debug_message =
-			string.format('console.log("File: %s, Line: %s, Message: ", "<Your Message>");', file_name, line_number)
+		debug_message = string.format(
+			'console.log("File: %s, Line: %s, %s: ", %s);',
+			file_name,
+			line_number,
+			word_under_cursor,
+			word_under_cursor
+		)
 	elseif filetype == "python" then
-		debug_message =
-			string.format('print("File: %s, Line: %s, Message: ", "<Your Message>")', file_name, line_number)
+		debug_message = string.format(
+			'print("File: %s, Line: %s, %s: ", %s)',
+			file_name,
+			line_number,
+			word_under_cursor,
+			word_under_cursor
+		)
 	elseif filetype == "cpp" then
 		debug_message = string.format(
-			'std::cout << "File: %s, Line: %s, Message: " << "<Your Message>" << std::endl;',
+			'std::cout << "File: %s, Line: %s, %s: " << %s << std::endl;',
 			file_name,
-			line_number
+			line_number,
+			word_under_cursor,
+			word_under_cursor
 		)
 	end
 
