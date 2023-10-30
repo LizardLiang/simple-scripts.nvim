@@ -177,6 +177,7 @@ M.insert_debug_message = function()
 		local buf = vim.api.nvim_get_current_buf()
 
 		if not function_node then
+			print("No function found.")
 			-- Handle the case where the cursor is not inside a function block
 			local open_brace = vim.fn.search("{", "bcnW")
 			local close_brace = vim.fn.search("}", "nW")
