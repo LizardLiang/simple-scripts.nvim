@@ -105,7 +105,7 @@ M.insert_debug_message = function()
 
 		if open_brace and close_brace and close_brace > open_brace then
 			-- If inside a block or parameter block, move the row to before the closing brace
-			row = close_brace - 1
+			row = close_brace + 1
 		end
 
 		vim.api.nvim_buf_set_lines(buf, row, row, false, { debug_message })
