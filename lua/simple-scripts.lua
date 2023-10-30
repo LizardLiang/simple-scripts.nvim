@@ -93,9 +93,11 @@ local function find_function_node()
 	cursor_row = cursor_row - 1
 
 	local function_node = nil
-	local is_parameter_block = false
-	local is_object_literal = false
-	local is_function_call = false
+	local PREPEND = "prepend"
+	local APPEND = "append"
+	local prepend_table = { "parameter_list", "argument_list", "object", "arguments" }
+	local append_table = { "variable_declarator" }
+	local insert_direction = APPEND
 
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col)
 
@@ -103,14 +105,11 @@ local function find_function_node()
 		local node_type = node:type()
 
 		function_node = node
-		if node_type == "parameter_list" or node_type == "argument_list" then
-			is_parameter_block = true
+		if vim.tbl_contains(prepend_table, node_type) then
+			insert_direction = PREPEND
 			break
-		elseif node_type == "object" then -- Check for object literals in JavaScript
-			is_object_literal = true
-			break
-		elseif node_type == "arguments" then
-			is_function_call = true
+		elseif vim.tbl_contains(append_table, node_type) then
+			insert_direction = APPEND
 			break
 		end
 		function_node = nil
@@ -118,7 +117,7 @@ local function find_function_node()
 		node = node:parent()
 	end
 
-	return function_node, is_parameter_block, is_object_literal, is_function_call
+	return function_node, insert_direction
 end
 
 M.insert_debug_message = function()
@@ -186,7 +185,7 @@ M.insert_debug_message = function()
 	end
 
 	if debug_message ~= "" then
-		local function_node, is_parameter_block, is_object_literal, is_function_call = find_function_node()
+		local function_node, insert_direction = find_function_node()
 		local row = vim.fn.line(".")
 		local buf = vim.api.nvim_get_current_buf()
 
@@ -197,13 +196,9 @@ M.insert_debug_message = function()
 
 		local start_row, _, end_row, _ = function_node:range()
 
-		if is_parameter_block or is_object_literal or is_function_call then
-			-- Insert the debug message at the start of the function block
-			local open_brace = vim.fn.search("{", "bcnW")
-			local close_brace = vim.fn.search("}", "nW")
-
+		if insert_direction == "prepend" then
 			row = start_row
-		elseif function_node then
+		else
 			-- Insert the debug message at the end of the function block
 			row = end_row + 1
 		end
