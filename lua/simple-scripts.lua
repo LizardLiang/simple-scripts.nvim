@@ -81,6 +81,32 @@ local function read_project_toml()
 	return nil
 end
 
+-- Function to find the nearest function block using Tree-sitter
+local function find_function_node()
+	local parser = vim.treesitter.get_parser(0, vim.bo.filetype)
+	local tree = parser:parse()[1]
+	local root = tree:root()
+	local cursor_row, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
+	cursor_row = cursor_row - 1
+
+	local function_node = nil
+
+	root:for_each_tree(function(tree)
+		local node = tree:root()
+		local lang = tree:lang()
+
+		if lang == "c" or lang == "cpp" or lang == "javascript" or lang == "typescript" then
+			node:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1):iter_children(function(child)
+				if child:type() == "function_definition" or child:type() == "method_definition" then
+					function_node = child
+				end
+			end)
+		end
+	end)
+
+	return function_node
+end
+
 M.insert_debug_message = function()
 	local custom_function = read_project_toml()
 	local filetype = vim.bo.filetype
@@ -146,14 +172,18 @@ M.insert_debug_message = function()
 	end
 
 	if debug_message ~= "" then
+		local function_node = find_function_node()
 		local row = vim.fn.line(".")
 		local buf = vim.api.nvim_get_current_buf()
 
-		local open_brace = vim.fn.search("{", "bcnW")
-		local close_brace = vim.fn.search("}", "nW")
+		if not function_node then
+			-- Handle the case where the cursor is not inside a function block
+			local open_brace = vim.fn.search("{", "bcnW")
+			local close_brace = vim.fn.search("}", "nW")
 
-		if open_brace and close_brace and close_brace > open_brace then
-			row = close_brace
+			if open_brace and close_brace and close_brace > open_brace then
+				row = close_brace
+			end
 		end
 
 		vim.api.nvim_buf_set_lines(buf, row, row, false, { debug_message })
