@@ -58,4 +58,32 @@ M.generate_cpp_header = function()
 	end
 end
 
+M.insert_debug_message = function()
+	local filetype = vim.bo.filetype
+	local line_number = vim.fn.line(".")
+	local file_name = vim.fn.expand("%:t")
+
+	local debug_message = ""
+
+	if filetype == "javascript" then
+		debug_message =
+			string.format('console.log("File: %s, Line: %s, Message: ", "<Your Message>");', file_name, line_number)
+	elseif filetype == "python" then
+		debug_message =
+			string.format('print("File: %s, Line: %s, Message: ", "<Your Message>")', file_name, line_number)
+	elseif filetype == "cpp" then
+		debug_message = string.format(
+			'std::cout << "File: %s, Line: %s, Message: " << "<Your Message>" << std::endl;',
+			file_name,
+			line_number
+		)
+	end
+
+	if debug_message ~= "" then
+		local row = vim.fn.line(".")
+		local buf = vim.api.nvim_get_current_buf()
+		vim.api.nvim_buf_set_lines(buf, row, row, false, { debug_message })
+	end
+end
+
 return M
