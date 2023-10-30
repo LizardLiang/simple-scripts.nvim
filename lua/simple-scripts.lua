@@ -102,8 +102,6 @@ local function find_function_node()
 	while node do
 		local node_type = node:type()
 
-		print(node_type)
-
 		if node_type == "function_definition" or node_type == "method_definition" then
 			function_node = node
 			break
@@ -198,9 +196,7 @@ M.insert_debug_message = function()
 			local open_brace = vim.fn.search("{", "bcnW")
 			local close_brace = vim.fn.search("}", "nW")
 
-			if open_brace and close_brace and close_brace > open_brace then
-				row = open_brace - 1
-			end
+			row = open_brace - 1
 		elseif function_node then
 			local start_row, _, end_row, _ = function_node:range()
 			-- Insert the debug message at the end of the function block
