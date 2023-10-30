@@ -66,7 +66,10 @@ M.insert_debug_message = function()
 
 	local debug_message = ""
 
-	if filetype == "javascript" then
+	local jsFileType = { "javascript", "typescript", "javascriptreact", "typescriptreact" }
+	local header_extensions = { "h", "hpp", "hxx" }
+
+	if vim.tbl_contains(jsFileType, filetype) then
 		debug_message = string.format(
 			'console.log("File: %s, Line: %s, %s: ", %s);',
 			file_name,
