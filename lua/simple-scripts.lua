@@ -98,18 +98,16 @@ local function find_function_node()
 
 	local function_node = nil
 
-	root:for_each_tree(function(tree)
-		local node = tree:root()
-		local lang = tree:lang()
+	local node = root
+	local lang = parser:lang()
 
-		if lang == "c" or lang == "cpp" or lang == "javascript" or lang == "typescript" then
-			node:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1):iter_children(function(child)
-				if child:type() == "function_definition" or child:type() == "method_definition" then
-					function_node = child
-				end
-			end)
-		end
-	end)
+	if lang == "c" or lang == "cpp" or lang == "javascript" or lang == "typescript" then
+		node:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1):iter_children(function(child)
+			if child:type() == "function_definition" or child:type() == "method_definition" then
+				function_node = child
+			end
+		end)
+	end
 
 	return function_node
 end
