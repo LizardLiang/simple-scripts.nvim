@@ -183,6 +183,7 @@ M.insert_debug_message = function()
 
 		if function_node then
 			-- Handle the case where the cursor is not inside a function block
+			print("function node")
 
 			if is_parameter_block then
 				print("is_parameter_block")
