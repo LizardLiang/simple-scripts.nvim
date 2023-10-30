@@ -113,6 +113,7 @@ local function find_function_node()
 			is_function_call = true
 			break
 		end
+		function_node = nil
 
 		node = node:parent()
 	end
