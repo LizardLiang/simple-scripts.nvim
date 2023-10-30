@@ -204,6 +204,8 @@ M.insert_debug_message = function()
 				-- Insert the debug message at the end of the function block
 				row = end_row
 			end
+		else
+			print("not function node")
 		end
 
 		vim.api.nvim_buf_set_lines(buf, row, row, false, { debug_message })
