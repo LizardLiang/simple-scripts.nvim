@@ -87,7 +87,9 @@ M.insert_debug_message = function()
 
 	local debug_message = ""
 
-	if filetype == "javascript" then
+	local js_like_languages = { "javascript", "typescript", "javascriptreact", "typescriptreact" }
+
+	if vim.tbl_contains(js_like_languages, filetype) then
 		debug_message = custom_function
 				and string.format(
 					'%s("File: %s, Line: %s, %s: ", %s);',
