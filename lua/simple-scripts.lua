@@ -99,14 +99,13 @@ M.insert_debug_message = function()
 		local row = vim.fn.line(".")
 		local buf = vim.api.nvim_get_current_buf()
 
-		-- Check if inside a block
-		local line_content = vim.fn.getline(".")
-		local open_brace = string.find(line_content, "{")
-		local close_brace = string.find(line_content, "}")
+		-- Check if inside a block or parameter block
+		local open_brace = vim.fn.search("{", "bcnW")
+		local close_brace = vim.fn.search("}", "nW")
 
-		if open_brace and not close_brace then
-			-- If inside a block, move the row to before the closing brace
-			row = vim.fn.search("}", "nW")
+		if open_brace and close_brace and close_brace > open_brace then
+			-- If inside a block or parameter block, move the row to before the closing brace
+			row = close_brace - 1
 		end
 
 		vim.api.nvim_buf_set_lines(buf, row, row, false, { debug_message })
