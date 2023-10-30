@@ -130,23 +130,22 @@ local function find_function_call()
 	local cursor_row, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
 	cursor_row = cursor_row - 1
 
-	local function_node = nil
-
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col)
 
 	while node do
 		local node_type = node:type()
 
-		function_node = node
 		if node_type == "call_expression" then
-			break
+			local start_row, start_col, end_row, end_col = node:range()
+			local line = vim.api.nvim_buf_get_lines(0, start_row, end_row + 1, false)[1]
+			local function_call_str = string.sub(line, start_col + 1, end_col)
+			return function_call_str
 		end
-		function_node = nil
 
 		node = node:parent()
 	end
 
-	return function_node
+	return nil
 end
 
 M.insert_debug_message = function()
