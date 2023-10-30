@@ -65,13 +65,16 @@ local function read_project_toml()
 		local lines = vim.fn.readfile(toml_file)
 		local in_simple_scripts = false
 		for _, line in ipairs(lines) do
-			if line:match("^simple%-scripts:") then
+			if line:match("^%[simple%-scripts%]") then
 				in_simple_scripts = true
-			elseif line:match("^[a-zA-Z]") then -- Start of a new section
+			elseif line:match("^%[") then -- Start of a new section
+				if in_simple_scripts then
+					return nil -- Exit early if exiting [simple-scripts] without finding function
+				end
 				in_simple_scripts = false
 			end
-			if in_simple_scripts and line:match('function:%s*"(.+)"') then
-				return line:match('function:%s*"(.+)"')
+			if in_simple_scripts and line:match('^function%s*=%s*"(.+)"') then
+				return line:match('^function%s*=%s*"(.+)"')
 			end
 		end
 	end
