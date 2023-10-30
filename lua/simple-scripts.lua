@@ -158,7 +158,7 @@ M.insert_debug_message = function()
 
 	local word_node = find_function_call()
 	if word_node then
-		word_under_cursor = word_node:text()
+		word_under_cursor = word_node:sexpr()
 	end
 
 	local debug_message = ""
