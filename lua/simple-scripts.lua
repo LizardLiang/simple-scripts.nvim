@@ -102,8 +102,10 @@ local function find_function_node()
 
 		if node_type == "function_definition" or node_type == "method_definition" then
 			function_node = node
+			break
 		elseif node_type == "parameter_list" or node_type == "argument_list" then
 			is_parameter_block = true
+			break
 		end
 
 		node = node:parent()
