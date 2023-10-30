@@ -190,14 +190,19 @@ M.insert_debug_message = function()
 		local buf = vim.api.nvim_get_current_buf()
 
 		if not function_node then
-		elseif is_parameter_block or is_object_literal or is_function_call then
+			vim.api.nvim_buf_set_lines(buf, row, row, false, { debug_message })
+			return
+		end
+
+		local start_row, _, end_row, _ = function_node:range()
+
+		if is_parameter_block or is_object_literal or is_function_call then
 			-- Insert the debug message at the start of the function block
 			local open_brace = vim.fn.search("{", "bcnW")
 			local close_brace = vim.fn.search("}", "nW")
 
-			row = open_brace - 1
+			row = start_row - 1
 		elseif function_node then
-			local start_row, _, end_row, _ = function_node:range()
 			-- Insert the debug message at the end of the function block
 			row = end_row + 1
 		end
