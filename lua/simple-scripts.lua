@@ -134,7 +134,8 @@ local function find_function_call()
 
 	while node do
 		local node_type = node:type()
-		local node_parent_type = node:parent():type()
+		local parent_node = node:parent()
+		local node_parent_type = parent_node and parent_node:type() or ""
 
 		if node_type == "call_expression" or node_parent_type == "argument_list" then
 			local start_row, start_col, end_row, end_col = node:range()
