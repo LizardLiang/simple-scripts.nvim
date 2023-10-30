@@ -113,7 +113,7 @@ local function find_function_node()
 		elseif node_type == "object" then -- Check for object literals in JavaScript
 			is_object_literal = true
 			break
-		elseif node_type == "function_call" then
+		elseif node_type == "arguments" then
 			is_function_call = true
 			break
 		end
