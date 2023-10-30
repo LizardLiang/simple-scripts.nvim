@@ -195,7 +195,7 @@ M.insert_debug_message = function()
 			if open_brace and close_brace and close_brace > open_brace then
 				row = close_brace
 			end
-		else
+		elseif function_node then
 			local start_row, _, end_row, _ = function_node:range()
 			-- Insert the debug message at the end of the function block
 			row = end_row
