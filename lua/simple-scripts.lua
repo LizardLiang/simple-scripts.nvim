@@ -98,6 +98,17 @@ M.insert_debug_message = function()
 	if debug_message ~= "" then
 		local row = vim.fn.line(".")
 		local buf = vim.api.nvim_get_current_buf()
+
+		-- Check if inside a block
+		local line_content = vim.fn.getline(".")
+		local open_brace = string.find(line_content, "{")
+		local close_brace = string.find(line_content, "}")
+
+		if open_brace and not close_brace then
+			-- If inside a block, move the row to before the closing brace
+			row = vim.fn.search("}", "nW") - 1
+		end
+
 		vim.api.nvim_buf_set_lines(buf, row, row, false, { debug_message })
 	end
 end
