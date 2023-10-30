@@ -120,12 +120,46 @@ local function find_function_node()
 	return function_node, insert_direction
 end
 
+local function find_function_call()
+	local original_filetype = vim.bo.filetype
+	local parser_filetype = original_filetype == "typescriptreact" and "typescript" or original_filetype
+
+	local parser = vim.treesitter.get_parser(0, parser_filetype)
+	local tree = parser:parse()[1]
+	local root = tree:root()
+	local cursor_row, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
+	cursor_row = cursor_row - 1
+
+	local function_node = nil
+
+	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col)
+
+	while node do
+		local node_type = node:type()
+
+		function_node = node
+		if node_type == "call_expression" then
+			break
+		end
+		function_node = nil
+
+		node = node:parent()
+	end
+
+	return function_node
+end
+
 M.insert_debug_message = function()
 	local custom_function = read_project_toml()
 	local filetype = vim.bo.filetype
 	local line_number = vim.fn.line(".")
 	local file_name = vim.fn.expand("%:t")
 	local word_under_cursor = vim.fn.expand("<cword>")
+
+	local word_node = find_function_call()
+	if word_node then
+		word_under_cursor = word_node:text()
+	end
 
 	local debug_message = ""
 
