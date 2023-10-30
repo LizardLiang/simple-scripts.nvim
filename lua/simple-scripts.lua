@@ -58,7 +58,28 @@ M.generate_cpp_header = function()
 	end
 end
 
+local function read_project_toml()
+	local project_dir = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h")
+	local toml_file = project_dir .. "/project.toml"
+	if vim.fn.filereadable(toml_file) == 1 then
+		local lines = vim.fn.readfile(toml_file)
+		local in_simple_scripts = false
+		for _, line in ipairs(lines) do
+			if line:match("^simple%-scripts:") then
+				in_simple_scripts = true
+			elseif line:match("^[a-zA-Z]") then -- Start of a new section
+				in_simple_scripts = false
+			end
+			if in_simple_scripts and line:match('function:%s*"(.+)"') then
+				return line:match('function:%s*"(.+)"')
+			end
+		end
+	end
+	return nil
+end
+
 M.insert_debug_message = function()
+	local custom_function = read_project_toml()
 	local filetype = vim.bo.filetype
 	local line_number = vim.fn.line(".")
 	local file_name = vim.fn.expand("%:t")
@@ -66,46 +87,68 @@ M.insert_debug_message = function()
 
 	local debug_message = ""
 
-	local jsFileType = { "javascript", "typescript", "javascriptreact", "typescriptreact" }
-	local header_extensions = { "h", "hpp", "hxx" }
-
-	if vim.tbl_contains(jsFileType, filetype) then
-		debug_message = string.format(
-			'console.log("File: %s, Line: %s, %s: ", %s);',
-			file_name,
-			line_number,
-			word_under_cursor,
-			word_under_cursor
-		)
+	if filetype == "javascript" then
+		debug_message = custom_function
+				and string.format(
+					'%s("File: %s, Line: %s, %s: ", %s);',
+					custom_function,
+					file_name,
+					line_number,
+					word_under_cursor,
+					word_under_cursor
+				)
+			or string.format(
+				'console.log("File: %s, Line: %s, %s: ", %s);',
+				file_name,
+				line_number,
+				word_under_cursor,
+				word_under_cursor
+			)
 	elseif filetype == "python" then
-		debug_message = string.format(
-			'print("File: %s, Line: %s, %s: ", %s)',
-			file_name,
-			line_number,
-			word_under_cursor,
-			word_under_cursor
-		)
+		debug_message = custom_function
+				and string.format(
+					'%s("File: %s, Line: %s, %s: ", %s)',
+					custom_function,
+					file_name,
+					line_number,
+					word_under_cursor,
+					word_under_cursor
+				)
+			or string.format(
+				'print("File: %s, Line: %s, %s: ", %s)',
+				file_name,
+				line_number,
+				word_under_cursor,
+				word_under_cursor
+			)
 	elseif filetype == "cpp" then
-		debug_message = string.format(
-			'std::cout << "File: %s, Line: %s, %s: " << %s << std::endl;',
-			file_name,
-			line_number,
-			word_under_cursor,
-			word_under_cursor
-		)
+		debug_message = custom_function
+				and string.format(
+					'%s << "File: %s, Line: %s, %s: " << %s << std::endl;',
+					custom_function,
+					file_name,
+					line_number,
+					word_under_cursor,
+					word_under_cursor
+				)
+			or string.format(
+				'std::cout << "File: %s, Line: %s, %s: " << %s << std::endl;',
+				file_name,
+				line_number,
+				word_under_cursor,
+				word_under_cursor
+			)
 	end
 
 	if debug_message ~= "" then
 		local row = vim.fn.line(".")
 		local buf = vim.api.nvim_get_current_buf()
 
-		-- Check if inside a block or parameter block
 		local open_brace = vim.fn.search("{", "bcnW")
 		local close_brace = vim.fn.search("}", "nW")
 
 		if open_brace and close_brace and close_brace > open_brace then
-			-- If inside a block or parameter block, move the row to before the closing brace
-			row = close_brace + 1
+			row = close_brace
 		end
 
 		vim.api.nvim_buf_set_lines(buf, row, row, false, { debug_message })
