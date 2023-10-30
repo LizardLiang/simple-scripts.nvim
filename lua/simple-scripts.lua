@@ -133,6 +133,12 @@ local function find_function_call()
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col)
 
 	local node_type = node:type()
+	local parent_node_type = node:parent():type()
+	local grandparent_node_type = node:parent():parent():type()
+
+	print(node_type)
+	print(parent_node_type)
+	print(grandparent_node_type)
 
 	if node:parent() == "call_expression" then
 		local start_row, start_col, end_row, end_col = node:range()
