@@ -193,7 +193,7 @@ M.insert_debug_message = function()
 			local close_brace = vim.fn.search("}", "nW")
 
 			if open_brace and close_brace and close_brace > open_brace then
-				row = open_brace + 1
+				row = open_brace - 1
 			end
 		elseif function_node then
 			print("function_node")
