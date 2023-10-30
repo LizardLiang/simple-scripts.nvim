@@ -95,8 +95,8 @@ local function find_function_node()
 	local function_node = nil
 	local PREPEND = "prepend"
 	local APPEND = "append"
-	local prepend_table = { "parameter_list", "argument_list", "object", "arguments" }
-	local append_table = { "variable_declarator" }
+	local prepend_table = { "parameter_list", "argument_list", "object", "arguments", "field_expression" }
+	local append_table = { "variable_declarator", "subscript_expression", "declaration" }
 	local insert_direction = APPEND
 
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col)
