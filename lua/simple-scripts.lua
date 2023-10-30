@@ -134,7 +134,7 @@ local function find_function_call()
 
 	local node_type = node:type()
 
-	if node_type == "call_expression" then
+	if node:parent() == "call_expression" then
 		local start_row, start_col, end_row, end_col = node:range()
 		local line = vim.api.nvim_buf_get_lines(0, start_row, end_row + 1, false)[1]
 		local function_call_str = string.sub(line, start_col + 1, end_col)
