@@ -185,9 +185,9 @@ M.insert_debug_message = function()
 
 		if function_node then
 			-- Handle the case where the cursor is not inside a function block
-			local start_row, _, end_row, _ = function_node:range()
 
 			if is_parameter_block then
+				print("is_parameter_block")
 				-- Insert the debug message at the start of the function block
 				local open_brace = vim.fn.search("{", "bcnW")
 				local close_brace = vim.fn.search("}", "nW")
@@ -196,6 +196,7 @@ M.insert_debug_message = function()
 					row = close_brace
 				end
 			else
+				local start_row, _, end_row, _ = function_node:range()
 				-- Insert the debug message at the end of the function block
 				row = end_row
 			end
