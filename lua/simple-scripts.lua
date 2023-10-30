@@ -201,7 +201,7 @@ M.insert_debug_message = function()
 			local open_brace = vim.fn.search("{", "bcnW")
 			local close_brace = vim.fn.search("}", "nW")
 
-			row = start_row - 1
+			row = start_row
 		elseif function_node then
 			-- Insert the debug message at the end of the function block
 			row = end_row + 1
