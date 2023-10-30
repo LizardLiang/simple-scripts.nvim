@@ -193,12 +193,13 @@ M.insert_debug_message = function()
 			local close_brace = vim.fn.search("}", "nW")
 
 			if open_brace and close_brace and close_brace > open_brace then
-				row = close_brace
+				row = open_brace + 1
 			end
 		elseif function_node then
+			print("function_node")
 			local start_row, _, end_row, _ = function_node:range()
 			-- Insert the debug message at the end of the function block
-			row = end_row
+			row = end_row + 1
 		end
 
 		vim.api.nvim_buf_set_lines(buf, row, row, false, { debug_message })
