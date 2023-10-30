@@ -84,32 +84,34 @@ end
 -- Function to find the nearest function block using Tree-sitter
 local function find_function_node()
 	local original_filetype = vim.bo.filetype
-	if original_filetype == "typescriptreact" then
-		vim.bo.filetype = "typescript"
-	elseif original_filetype == "javascriptreact" then
-		vim.bo.filetype = "javascript"
-	end
+	local parser_filetype = original_filetype == "typescriptreact" and "typescript" or original_filetype
 
-	local parser = vim.treesitter.get_parser(0, vim.bo.filetype)
+	local parser = vim.treesitter.get_parser(0, parser_filetype)
 	local tree = parser:parse()[1]
 	local root = tree:root()
 	local cursor_row, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
 	cursor_row = cursor_row - 1
 
 	local function_node = nil
+	local is_parameter_block = false
 
-	local node = root
-	local lang = parser:lang()
+	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col)
 
-	if lang == "c" or lang == "cpp" or lang == "javascript" or lang == "typescript" then
-		node:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1):iter_children(function(child)
-			if child:type() == "function_definition" or child:type() == "method_definition" then
-				function_node = child
-			end
-		end)
+	while node do
+		local node_type = node:type()
+
+		if node_type == "function_definition" or node_type == "method_definition" then
+			function_node = node
+			break
+		elseif node_type == "parameter_list" or node_type == "argument_list" then
+			is_parameter_block = true
+			break
+		end
+
+		node = node:parent()
 	end
 
-	return function_node
+	return function_node, is_parameter_block
 end
 
 M.insert_debug_message = function()
@@ -177,17 +179,25 @@ M.insert_debug_message = function()
 	end
 
 	if debug_message ~= "" then
-		local function_node = find_function_node()
+		local function_node, is_parameter_block = find_function_node()
 		local row = vim.fn.line(".")
 		local buf = vim.api.nvim_get_current_buf()
 
 		if function_node then
 			-- Handle the case where the cursor is not inside a function block
-			local open_brace = vim.fn.search("{", "bcnW")
-			local close_brace = vim.fn.search("}", "nW")
+			local start_row, _, end_row, _ = function_node:range()
 
-			if open_brace and close_brace and close_brace > open_brace then
-				row = close_brace
+			if is_parameter_block then
+				-- Insert the debug message at the start of the function block
+				local open_brace = vim.fn.search("{", "bcnW")
+				local close_brace = vim.fn.search("}", "nW")
+
+				if open_brace and close_brace and close_brace > open_brace then
+					row = close_brace
+				end
+			else
+				-- Insert the debug message at the end of the function block
+				row = end_row
 			end
 		end
 
