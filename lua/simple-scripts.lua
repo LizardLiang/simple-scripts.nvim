@@ -95,7 +95,8 @@ local function find_function_node()
 	local function_node = nil
 	local PREPEND = "prepend"
 	local APPEND = "append"
-	local prepend_table = { "parameter_list", "argument_list", "object", "arguments", "field_expression" }
+	local prepend_table =
+		{ "parameter_list", "argument_list", "object", "arguments", "field_expression", "call_expression" }
 	local append_table = { "variable_declarator", "subscript_expression", "parameter_declaration" }
 	local insert_direction = APPEND
 
@@ -230,8 +231,6 @@ M.insert_debug_message = function()
 		end
 
 		local start_row, _, end_row, _ = function_node:range()
-
-		print(start_row, end_row, function_node:type())
 
 		if insert_direction == "prepend" then
 			row = start_row
