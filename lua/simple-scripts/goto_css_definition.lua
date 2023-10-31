@@ -123,7 +123,7 @@ local find_class_name = function(content)
 	print(object_name, class_name)
 
 	if object_name == nil and class_name == nil then
-		object_name, class_name = content:match('([%w_]+)%["([%w%-_]+)"%]')
+		object_name, class_name = content:match('%{([%w_]+)%["([%w%-_]+)"%]%}')
 		print(object_name, class_name)
 	end
 
