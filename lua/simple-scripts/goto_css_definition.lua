@@ -113,6 +113,18 @@ local function jump_to_class_definition(file_path, class_name)
 	end
 end
 
+local find_class_name = function(content)
+	local object_name, class_name
+
+	object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
+
+	if object_name == nil or class_name == nil then
+		object_name, class_name = content:match('([%w_]+)%["([%w%-_]+)"%]')
+	end
+
+	return object_name, class_name
+end
+
 local find_class_definition = function()
 	local filetype = vim.bo.filetype
 	if filetype == "typescriptreact" then
@@ -129,7 +141,7 @@ local find_class_definition = function()
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1)
 	if node then
 		local content = find_full_expression(node)
-		object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
+		object_name, class_name = find_class_name(content)
 	end
 
 	if object_name and class_name then
