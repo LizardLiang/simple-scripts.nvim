@@ -1,6 +1,7 @@
 local function find_project_root()
 	local dir = vim.fn.expand("%:p:h")
 	while dir ~= "/" do
+		print(dir)
 		if vim.fn.filereadable(dir .. "/tsconfig.json") == 1 then
 			return dir
 		end
