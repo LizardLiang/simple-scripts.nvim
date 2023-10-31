@@ -23,7 +23,6 @@ local function read_tsconfig()
 		local sanitized_content = content:gsub("//[^\n]*", "")
 
 		local ok, json_data = pcall(vim.fn.json_decode, sanitized_content)
-		print(ok, json_data)
 		if ok then
 			return json_data
 		else
@@ -64,11 +63,10 @@ local function find_import_of_object(object_name)
 	end
 
 	local tsconfig = read_tsconfig()
-	print(tsconfig)
 	if tsconfig and tsconfig.compilerOptions and tsconfig.compilerOptions.paths then
 		for alias, paths in pairs(tsconfig.compilerOptions.paths) do
-			print(alias, paths, object_name)
-			if object_name:find("^" .. alias:gsub("%*", ".*")) then
+			print(alias, object_name)
+			if object_name:match("^" .. alias:gsub("%*", ".*")) then
 				local actual_path = paths[1]:gsub("%*", object_name:match(alias:gsub("%*", "(.*)")))
 				import_path = actual_path
 				break
