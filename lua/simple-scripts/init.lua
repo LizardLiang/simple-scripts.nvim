@@ -250,6 +250,6 @@ M.insert_debug_message = function()
 	end
 end
 
-M.goto_css_definition = find_class_definition()
+M.goto_css_definition = find_class_definition
 
 return M
