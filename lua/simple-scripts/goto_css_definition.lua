@@ -19,10 +19,10 @@ local function read_tsconfig()
 	print("f", f)
 	if f then
 		local content = f:read("*all")
-		print(content)
 		f:close()
 		local sanitized_content = content:gsub("//.-\n", "\n"):gsub("/%*.-%*/", "")
 		local ok, json_data = pcall(vim.fn.json_decode, sanitized_content)
+		print(ok, json_data)
 		if ok then
 			return json_data
 		else
