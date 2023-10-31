@@ -70,6 +70,7 @@ local function find_import_of_object(object_name)
 			print(alias, object_name)
 			if string.match(object_name, "^" .. alias:gsub("%*", ".*")) then
 				local actual_path = paths[1]:gsub("%*", object_name:match(alias:gsub("%*", "(.*)")))
+				print("actual_path", actual_path)
 				import_path = actual_path
 				break
 			end
