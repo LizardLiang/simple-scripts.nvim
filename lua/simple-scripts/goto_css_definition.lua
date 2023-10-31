@@ -67,6 +67,7 @@ local find_class_definition = function()
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1)
 	if node then
 		local content = vim.treesitter.get_node_text(node, 0)
+		print(content)
 		object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
 	end
 
