@@ -46,6 +46,7 @@ local function find_import_of_object(object_name)
 	end
 
 	local tsconfig = read_tsconfig()
+	print(tsconfig)
 	if tsconfig and tsconfig.compilerOptions and tsconfig.compilerOptions.paths then
 		for alias, paths in pairs(tsconfig.compilerOptions.paths) do
 			print(alias, paths, object_name)
@@ -56,6 +57,7 @@ local function find_import_of_object(object_name)
 			end
 		end
 	end
+
 	return import_path
 end
 
