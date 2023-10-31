@@ -18,6 +18,7 @@ end
 
 local function find_import_of_object(object_name)
 	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+	local import_path = nil
 	for _, line in ipairs(lines) do
 		-- Handle ES6 import statements
 		if line:match("import%s+.*from%s+[\"']") then
@@ -37,12 +38,24 @@ local function find_import_of_object(object_name)
 			if var_name and require_path then
 				var_name = var_name:match("^%s*(.-)%s*$") -- Remove leading/trailing spaces
 				if var_name == object_name then
-					return require_path
+					import_path = require_path
+					break
 				end
 			end
 		end
 	end
-	return nil
+
+	local tsconfig = read_tsconfig()
+	if tsconfig and tsconfig.compilerOptions and tsconfig.compilerOptions.paths then
+		for alias, paths in pairs(tsconfig.compilerOptions.paths) do
+			if object_name:find("^" .. alias:gsub("%*", ".*")) then
+				local actual_path = paths[1]:gsub("%*", object_name:match(alias:gsub("%*", "(.*)")))
+				import_path = actual_path
+				break
+			end
+		end
+	end
+	return import_path
 end
 
 local function find_full_expression(node)
