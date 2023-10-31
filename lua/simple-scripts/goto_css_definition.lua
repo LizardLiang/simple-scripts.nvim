@@ -120,16 +120,12 @@ local find_class_name = function(content)
 
 	object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
 
-	print(object_name, class_name)
-
 	if object_name == nil and class_name == nil then
 		object_name, class_name = content:match('([%w_]+)%["([%w%-_]+)"%]')
-		print(object_name, class_name)
 	end
 
 	if object_name == nil and class_name == nil then
 		object_name, class_name = content:match("([%w_]+)%['([%w%-_]+)'%]")
-		print(object_name, class_name)
 	end
 
 	return object_name, class_name
@@ -151,7 +147,6 @@ local find_class_definition = function()
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1)
 	if node then
 		local content = find_full_expression(node)
-		print(content)
 		object_name, class_name = find_class_name(content)
 	end
 
