@@ -118,8 +118,11 @@ local find_class_name = function(content)
 
 	object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
 
-	if object_name == nil or class_name == nil then
+	print(object_name, class_name)
+
+	if object_name == nil and class_name == nil then
 		object_name, class_name = content:match('([%w_]+)%["([%w%-_]+)"%]')
+		print(object_name, class_name)
 	end
 
 	return object_name, class_name
