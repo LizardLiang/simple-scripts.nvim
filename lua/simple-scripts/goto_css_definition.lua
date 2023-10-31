@@ -3,7 +3,14 @@ local function read_tsconfig()
 	if f then
 		local content = f:read("*all")
 		f:close()
-		return vim.fn.json_decode(content)
+		-- Remove comments from the JSON content
+		local sanitized_content = content:gsub("//.-\n", "\n"):gsub("/%*.-%*/", "")
+		local ok, json_data = pcall(vim.fn.json_decode, sanitized_content)
+		if ok then
+			return json_data
+		else
+			return nil, "Could not parse tsconfig.json"
+		end
 	else
 		return nil, "Could not read tsconfig.json"
 	end
