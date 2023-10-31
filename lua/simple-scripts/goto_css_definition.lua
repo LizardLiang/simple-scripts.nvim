@@ -110,6 +110,8 @@ local find_class_definition = function()
 		object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
 	end
 
+	print(object_name, class_name)
+
 	if object_name and class_name then
 		local import_path = find_import_of_object(object_name)
 
