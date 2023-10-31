@@ -84,6 +84,7 @@ local function find_full_expression(node)
 		local parent = node:parent()
 		print(parent:type())
 		print(parent:parent():type())
+		print(parent:parent():parent():type())
 		if node:type() == "identifier" or node:type() == "type_identifier" then
 			node = parent
 		elseif parent and parent:type() == "member_expression" then
