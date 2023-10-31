@@ -87,7 +87,7 @@ local function find_full_expression(node)
 			node = parent
 		elseif parent and parent:type() == "member_expression" then
 			node = parent
-		elseif node:type() == "index" then
+		elseif node:type() == "string" and parent:type() == "subscript_expression" then
 			node = parent
 		else
 			break
