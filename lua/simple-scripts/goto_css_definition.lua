@@ -16,7 +16,10 @@ local function read_tsconfig()
 		return nil, "Could not find project root"
 	end
 
+	print(root_dir)
+
 	local f = io.open(root_dir .. "/tsconfig.json", "r")
+	print("f", f)
 	if f then
 		local content = f:read("*all")
 		f:close()
