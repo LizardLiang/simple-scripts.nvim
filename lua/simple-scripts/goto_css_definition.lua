@@ -68,7 +68,7 @@ local function find_import_of_object(object_name)
 		for alias, paths in pairs(tsconfig.compilerOptions.paths) do
 			print(alias, path)
 			if string.match(path, "^" .. alias:gsub("%*", ".*")) then
-				local actual_path = paths[1]:gsub("%*", path:match(alias:gsub("%*", "(.*)")))
+				local actual_path = paths[1]:gsub("%*", import_path:match(alias:gsub("%*", "(.*)")))
 				print("actual_path", actual_path)
 				import_path = actual_path
 				break
