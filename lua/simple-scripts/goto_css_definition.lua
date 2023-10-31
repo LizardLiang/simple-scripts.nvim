@@ -1,9 +1,24 @@
+local function find_project_root()
+	local dir = vim.fn.expand("%:p:h")
+	while dir ~= "/" do
+		if vim.fn.filereadable(dir .. "/tsconfig.json") == 1 then
+			return dir
+		end
+		dir = vim.fn.fnamemodify(dir, ":h")
+	end
+	return nil
+end
+
 local function read_tsconfig()
-	local f = io.open("tsconfig.json", "r")
+	local root_dir = find_project_root()
+	if not root_dir then
+		return nil, "Could not find project root"
+	end
+
+	local f = io.open(root_dir .. "/tsconfig.json", "r")
 	if f then
 		local content = f:read("*all")
 		f:close()
-		-- Remove comments from the JSON content
 		local sanitized_content = content:gsub("//.-\n", "\n"):gsub("/%*.-%*/", "")
 		local ok, json_data = pcall(vim.fn.json_decode, sanitized_content)
 		if ok then
