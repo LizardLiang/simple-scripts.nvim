@@ -1,3 +1,4 @@
+local find_class_definition = require("goto_css_definition")
 local M = {}
 
 M.toggle = function()
@@ -248,5 +249,7 @@ M.insert_debug_message = function()
 		vim.api.nvim_buf_set_lines(buf, row, row, false, { debug_message })
 	end
 end
+
+M.goto_css_definition = find_class_definition()
 
 return M
