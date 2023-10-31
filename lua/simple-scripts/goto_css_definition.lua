@@ -1,10 +1,19 @@
-local json = require("json") -- You'll need a JSON library to parse tsconfig.json
+local function read_json_file(path)
+	local f = io.open(path, "r")
+	if f then
+		local content = f:read("*all")
+		f:close()
+		return vim.fn.json_decode(content)
+	else
+		return nil, "Could not read file"
+	end
+end
 
 local function read_tsconfig()
 	local root_dir = vim.fn.getcwd()
 	local tsconfig_path = root_dir .. "/tsconfig.json"
 	local tsconfig_str = table.concat(vim.fn.readfile(tsconfig_path), "\n")
-	return json.decode(tsconfig_str)
+	return read_json_file(tsconfig_str)
 end
 
 local function resolve_alias(path)
