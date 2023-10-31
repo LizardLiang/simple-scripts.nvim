@@ -86,9 +86,10 @@ local find_class_definition = function()
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1)
 	if node then
 		local content = find_full_expression(node)
-		print(content) -- This should now print "styles.secondary_btn"
 		object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
 	end
+
+	print(object_name, class_name)
 
 	if object_name and class_name then
 		local import_path = find_import_of_object(object_name)
