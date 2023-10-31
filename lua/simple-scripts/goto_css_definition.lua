@@ -52,7 +52,11 @@ local function find_import_of_object(object_name)
 end
 
 local find_class_definition = function()
-	local parser = vim.treesitter.get_parser(0, vim.bo.filetype)
+	local filetype = vim.bo.filetype
+	if filetype == "typescriptreact" then
+		filetype = "typescript"
+	end
+	local parser = vim.treesitter.get_parser(0, filetype)
 	local tree = parser:parse()[1]
 	local root = tree:root()
 	local cursor_row, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
