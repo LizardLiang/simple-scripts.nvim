@@ -93,6 +93,25 @@ local function find_full_expression(node)
 	return vim.treesitter.get_node_text(node, 0)
 end
 
+local function jump_to_class_definition(file_path, class_name)
+	local f = io.open(file_path, "r")
+	if f then
+		local line_number = 0
+		for line in f:lines() do
+			line_number = line_number + 1
+			if line:find(class_name) then
+				f:close()
+				vim.cmd("edit " .. file_path)
+				vim.cmd("normal " .. line_number .. "G")
+				return
+			end
+		end
+		f:close()
+	else
+		print("Could not open file: " .. file_path)
+	end
+end
+
 local find_class_definition = function()
 	local filetype = vim.bo.filetype
 	if filetype == "typescriptreact" then
@@ -108,20 +127,16 @@ local find_class_definition = function()
 
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1)
 	if node then
-		print(node:type())
 		local content = find_full_expression(node)
 		object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
 	end
-
-	print(object_name, class_name)
 
 	if object_name and class_name then
 		local import_path = find_import_of_object(object_name)
 
 		if import_path then
 			-- Open the CSS file and search for the class definition
-			vim.cmd("edit " .. import_path:gsub("\\", "/"))
-			vim.cmd("normal! /\\." .. class_name .. "\\C\\<CR>")
+			jump_to_class_definition(import_path, class_name)
 		else
 			print("Import not found")
 		end
