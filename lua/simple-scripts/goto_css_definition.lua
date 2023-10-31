@@ -27,6 +27,7 @@ local function find_import_of_object(object_name)
 
 	local import_path = nil
 	local _, _, end_row, end_col = root:range()
+	print(end_row, end_col)
 	root:descendant_for_range(0, 0, end_row, end_col):iter_children(function(node)
 		local node_type = node:type()
 
