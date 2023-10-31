@@ -51,6 +51,18 @@ local function find_import_of_object(object_name)
 	return import_path
 end
 
+local function find_full_expression(node)
+	while node do
+		local parent = node:parent()
+		if parent and parent:type() == "member_expression" then
+			node = parent
+		else
+			break
+		end
+	end
+	return vim.treesitter.get_node_text(node, 0)
+end
+
 local find_class_definition = function()
 	local filetype = vim.bo.filetype
 	if filetype == "typescriptreact" then
@@ -66,8 +78,8 @@ local find_class_definition = function()
 
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1)
 	if node then
-		local content = vim.treesitter.get_node_text(node, 0)
-		print(content)
+		local content = find_full_expression(node)
+		print(content) -- This should now print "styles.secondary_btn"
 		object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
 	end
 
