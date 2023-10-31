@@ -108,6 +108,7 @@ local find_class_definition = function()
 
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1)
 	if node then
+		print(node:type())
 		local content = find_full_expression(node)
 		object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
 	end
