@@ -31,7 +31,7 @@ local function find_import_of_object(object_name)
 	root:descendant_for_range(0, 0, end_row, end_col):iter_children(function(node)
 		local node_type = node:type()
 
-		if node_type == "import_declaration" then
+		if node_type == "import_statement" then
 			for child in node:iter_children() do
 				if child:type() == "import_specifier" then
 					local content = vim.treesitter.get_node_text(child, 0)
