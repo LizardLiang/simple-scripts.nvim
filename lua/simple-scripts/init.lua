@@ -1,4 +1,4 @@
-local find_class_definition = require("goto_css_definition")
+local find_class_definition = require("simple-scripts.goto_css_definition")
 local M = {}
 
 M.toggle = function()
