@@ -146,6 +146,7 @@ local find_class_definition = function()
 	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1)
 	if node then
 		local content = find_full_expression(node)
+		print(content)
 		object_name, class_name = find_class_name(content)
 	end
 
