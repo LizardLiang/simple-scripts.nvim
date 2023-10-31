@@ -1,86 +1,80 @@
-local function read_json_file(path)
-	local f = io.open(path, "r")
+local function read_tsconfig()
+	local f = io.open("tsconfig.json", "r")
 	if f then
 		local content = f:read("*all")
 		f:close()
 		return vim.fn.json_decode(content)
 	else
-		return nil, "Could not read file"
+		return nil, "Could not read tsconfig.json"
 	end
 end
 
-local function read_tsconfig()
-	local root_dir = vim.fn.getcwd()
-	local tsconfig_path = root_dir .. "/tsconfig.json"
-	local tsconfig_str = table.concat(vim.fn.readfile(tsconfig_path), "\n")
-	return read_json_file(tsconfig_str)
-end
+local function find_import_of_object(object_name)
+	local parser = vim.treesitter.get_parser(0, vim.bo.filetype)
+	local tree = parser:parse()[1]
+	local root = tree:root()
 
-local function resolve_alias(path)
+	local import_path = nil
+
+	root:descendant_for_range(0, 0, root:end_position()):iter_children(function(node)
+		local node_type = node:type()
+
+		if node_type == "import_declaration" then
+			for child in node:iter_children() do
+				if child:type() == "import_specifier" then
+					local content = vim.treesitter.get_node_text(child, 0)
+					if content == object_name then
+						for import_child in node:iter_children() do
+							if import_child:type() == "string" then
+								import_path = vim.treesitter.get_node_text(import_child, 0):gsub('"', "")
+								return false -- Stop the iteration
+							end
+						end
+					end
+				end
+			end
+		end
+	end)
+
 	local tsconfig = read_tsconfig()
-	if not tsconfig or not tsconfig.compilerOptions or not tsconfig.compilerOptions.paths then
-		return path
-	end
-
-	local paths = tsconfig.compilerOptions.paths
-	for alias, actual_paths in pairs(paths) do
-		alias = string.gsub(alias, "/*$", "") -- Remove trailing slash or asterisk
-		if string.find(path, "^" .. alias) then
-			local actual_path = actual_paths[1] -- Use the first mapping
-			actual_path = string.gsub(actual_path, "/*$", "") -- Remove trailing slash or asterisk
-			return string.gsub(path, "^" .. alias, actual_path)
+	if tsconfig and tsconfig.compilerOptions and tsconfig.compilerOptions.paths then
+		local alias = tsconfig.compilerOptions.paths[object_name]
+		if alias and alias[1] then
+			import_path = alias[1]:gsub("/*$", "") -- Remove trailing "/*" if present
 		end
 	end
 
-	return path
+	return import_path
 end
 
-local function find_class_definition()
+local find_class_definition = function()
+	local parser = vim.treesitter.get_parser(0, vim.bo.filetype)
+	local tree = parser:parse()[1]
+	local root = tree:root()
 	local cursor_row, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
-	cursor_row = cursor_row - 1 -- Convert to 0-based index
+	cursor_row = cursor_row - 1
 
-	-- Get the word under the cursor
-	local class_name = vim.fn.expand("<cword>")
+	local object_name, class_name
 
-	-- Search for the import statement in the buffer
-	local lines = vim.api.nvim_buf_get_lines(0, 0, cursor_row, false)
-	local module_path = nil
-	for _, line in ipairs(lines) do
-		if string.match(line, "import .* from '(.*)'") then
-			module_path = string.match(line, "import .* from '(.*)'")
-			break
-		elseif string.match(line, "require%('(.*)'%)") then
-			module_path = string.match(line, "require%('(.*)'%)")
-			break
+	local node = root:descendant_for_range(cursor_row, cursor_col, cursor_row, cursor_col + 1)
+	if node then
+		local content = vim.treesitter.get_node_text(node, 0)
+		object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
+	end
+
+	if object_name and class_name then
+		local import_path = find_import_of_object(object_name)
+
+		if import_path then
+			-- Open the CSS file and search for the class definition
+			vim.cmd("edit " .. import_path)
+			vim.cmd("normal! /\\." .. class_name .. "\\C\\<CR>")
+		else
+			print("Import not found")
 		end
+	else
+		print("Could not identify object and class name")
 	end
-
-	if not module_path then
-		print("Could not find import or require statement.")
-		return
-	end
-
-	-- Resolve alias
-	module_path = resolve_alias(module_path)
-
-	-- Get the project root directory
-	local root_dir = vim.fn.getcwd()
-
-	-- Construct the absolute path to the SCSS file
-	local file_path = root_dir .. "/" .. module_path .. ".scss"
-
-	-- Search for the class definition in the SCSS file
-	local scss_lines = vim.fn.readfile(file_path)
-	for i, line in ipairs(scss_lines) do
-		if string.match(line, "%." .. class_name) then
-			-- Open the file and jump to the line
-			vim.api.nvim_command("e " .. file_path)
-			vim.api.nvim_command("normal! " .. i .. "G")
-			return
-		end
-	end
-
-	print("Could not find class definition.")
 end
 
 return find_class_definition
