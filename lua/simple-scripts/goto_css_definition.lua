@@ -19,8 +19,8 @@ local function find_import_of_object(object_name)
 	local root = tree:root()
 
 	local import_path = nil
-
-	root:descendant_for_range(0, 0, root:end_position()):iter_children(function(node)
+	local _, _, end_row, end_col = root:range()
+	root:descendant_for_range(0, 0, end_row, end_col):iter_children(function(node)
 		local node_type = node:type()
 
 		if node_type == "import_declaration" then
