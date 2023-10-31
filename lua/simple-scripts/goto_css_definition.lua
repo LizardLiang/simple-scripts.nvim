@@ -17,53 +17,32 @@ local function read_tsconfig()
 end
 
 local function find_import_of_object(object_name)
-	local filetype = vim.bo.filetype
-	if filetype == "typescriptreact" then
-		filetype = "typescript"
-	end
-	local parser = vim.treesitter.get_parser(0, filetype)
-	local tree = parser:parse()[1]
-	local root = tree:root()
-
-	local import_path = nil
-	local _, _, end_row, end_col = root:range()
-	print(end_row, end_col)
-	root:iter_children(function(node)
-		local node_type = node:type()
-
-		print(node_type)
-
-		if node_type == "import_statement" then
-			for child in node:iter_children() do
-				if child:type() == "import_specifier" then
-					local content = vim.treesitter.get_node_text(child, 0)
-					print(content)
-					if content == object_name then
-						for import_child in node:iter_children() do
-							if import_child:type() == "string" then
-								import_path = vim.treesitter.get_node_text(import_child, 0):gsub('"', "")
-								return false -- Stop the iteration
-							end
-						end
+	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+	for _, line in ipairs(lines) do
+		-- Handle ES6 import statements
+		if line:match("import%s+.*from%s+[\"']") then
+			local import_as, import_from = line:match("import%s+(.*)%s+from%s+[\"'](.-)[\"']")
+			if import_as and import_from then
+				local import_items = vim.split(import_as, ",")
+				for _, item in ipairs(import_items) do
+					item = item:match("^%s*(.-)%s*$") -- Remove leading/trailing spaces
+					if item == object_name then
+						return import_from
 					end
 				end
 			end
-		end
-	end)
-
-	print(import_path)
-
-	local tsconfig = read_tsconfig()
-	if tsconfig and tsconfig.compilerOptions and tsconfig.compilerOptions.paths then
-		local alias = tsconfig.compilerOptions.paths[object_name]
-		if alias and alias[1] then
-			import_path = alias[1]:gsub("/*$", "") -- Remove trailing "/*" if present
+		-- Handle CommonJS require statements
+		elseif line:match("const%s+.*=%s+require%s*%(") then
+			local var_name, require_path = line:match("const%s+(.-)%s*=%s*require%s*%([\"'](.-)[\"']%)")
+			if var_name and require_path then
+				var_name = var_name:match("^%s*(.-)%s*$") -- Remove leading/trailing spaces
+				if var_name == object_name then
+					return require_path
+				end
+			end
 		end
 	end
-
-	print(import_path)
-
-	return import_path
+	return nil
 end
 
 local function find_full_expression(node)
