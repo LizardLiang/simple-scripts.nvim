@@ -28,7 +28,7 @@ local function find_import_of_object(object_name)
 				for _, item in ipairs(import_items) do
 					item = item:match("^%s*(.-)%s*$") -- Remove leading/trailing spaces
 					if item == object_name then
-						return import_from
+						import_path = import_from
 					end
 				end
 			end
