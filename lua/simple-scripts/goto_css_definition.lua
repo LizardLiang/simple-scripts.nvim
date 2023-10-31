@@ -115,7 +115,7 @@ local find_class_definition = function()
 
 		if import_path then
 			-- Open the CSS file and search for the class definition
-			vim.cmd("edit " .. import_path)
+			vim.cmd("edit " .. import_path:gsub("\\", "/"))
 			vim.cmd("normal! /\\." .. class_name .. "\\C\\<CR>")
 		else
 			print("Import not found")
