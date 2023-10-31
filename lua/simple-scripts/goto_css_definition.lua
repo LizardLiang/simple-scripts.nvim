@@ -65,10 +65,9 @@ local function find_import_of_object(object_name)
 	local tsconfig = read_tsconfig()
 	if tsconfig and tsconfig.compilerOptions and tsconfig.compilerOptions.paths then
 		local path = import_path:match("(.*[/\\])")
-		print(path)
 		for alias, paths in pairs(tsconfig.compilerOptions.paths) do
-			print(alias, object_name)
-			if string.match(object_name, "^" .. alias:gsub("%*", ".*")) then
+			print(alias, path)
+			if string.match(path, "^" .. alias:gsub("%*", ".*")) then
 				local actual_path = paths[1]:gsub("%*", object_name:match(alias:gsub("%*", "(.*)")))
 				print("actual_path", actual_path)
 				import_path = actual_path
