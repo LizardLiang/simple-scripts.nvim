@@ -86,6 +86,8 @@ local function find_full_expression(node)
 			node = parent
 		elseif parent and parent:type() == "member_expression" then
 			node = parent
+		elseif parent and parent:type() == "expression_statement" then
+			node = parent
 		else
 			break
 		end
