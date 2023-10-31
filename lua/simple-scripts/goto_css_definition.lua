@@ -47,6 +47,8 @@ local function find_import_of_object(object_name)
 		end
 	end)
 
+	print(import_path)
+
 	local tsconfig = read_tsconfig()
 	if tsconfig and tsconfig.compilerOptions and tsconfig.compilerOptions.paths then
 		local alias = tsconfig.compilerOptions.paths[object_name]
@@ -54,6 +56,8 @@ local function find_import_of_object(object_name)
 			import_path = alias[1]:gsub("/*$", "") -- Remove trailing "/*" if present
 		end
 	end
+
+	print(import_path)
 
 	return import_path
 end
@@ -88,8 +92,6 @@ local find_class_definition = function()
 		local content = find_full_expression(node)
 		object_name, class_name = content:match("([%w_]+)%s*%.%s*([%w_]+)")
 	end
-
-	print(object_name, class_name)
 
 	if object_name and class_name then
 		local import_path = find_import_of_object(object_name)
