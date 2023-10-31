@@ -10,7 +10,11 @@ local function read_tsconfig()
 end
 
 local function find_import_of_object(object_name)
-	local parser = vim.treesitter.get_parser(0, vim.bo.filetype)
+	local filetype = vim.bo.filetype
+	if filetype == "typescriptreact" then
+		filetype = "typescript"
+	end
+	local parser = vim.treesitter.get_parser(0, filetype)
 	local tree = parser:parse()[1]
 	local root = tree:root()
 
