@@ -16,12 +16,14 @@ local function read_tsconfig()
 	end
 
 	local f = io.open(root_dir .. "/tsconfig.json", "r")
-	print("f", f)
 	if f then
 		local content = f:read("*all")
 		f:close()
-		local sanitized_content = content:gsub("//.-\n", "\n"):gsub("/%*.-%*/", "")
-		print("sanitized_content", sanitized_content)
+		-- Remove single-line comments
+		local sanitized_content = content:gsub("//[^\n]*", "")
+		-- Remove multi-line comments
+		sanitized_content = sanitized_content:gsub("/%*.-*%/", "")
+
 		local ok, json_data = pcall(vim.fn.json_decode, sanitized_content)
 		if ok then
 			return json_data
