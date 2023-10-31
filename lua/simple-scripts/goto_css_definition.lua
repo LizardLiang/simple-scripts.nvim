@@ -21,8 +21,6 @@ local function read_tsconfig()
 		f:close()
 		-- Remove single-line comments
 		local sanitized_content = content:gsub("//[^\n]*", "")
-		-- Remove multi-line comments
-		sanitized_content = sanitized_content:gsub("/%*.-*%/", "")
 
 		local ok, json_data = pcall(vim.fn.json_decode, sanitized_content)
 		print(ok, json_data)
