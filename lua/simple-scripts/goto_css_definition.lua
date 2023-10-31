@@ -97,9 +97,10 @@ local function jump_to_class_definition(file_path, class_name)
 	local f = io.open(file_path, "r")
 	if f then
 		local line_number = 0
+		local pattern = "%." .. class_name .. "[%s{]"
 		for line in f:lines() do
 			line_number = line_number + 1
-			if line:find(class_name) then
+			if line:find(pattern) then
 				f:close()
 				vim.cmd("edit " .. file_path)
 				vim.cmd("normal " .. line_number .. "G")
