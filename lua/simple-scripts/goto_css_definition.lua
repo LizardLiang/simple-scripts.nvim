@@ -81,6 +81,7 @@ end
 
 local function find_full_expression(node)
 	while node do
+		print(node)
 		local parent = node:parent()
 		if node:type() == "identifier" or node:type() == "type_identifier" then
 			node = parent
