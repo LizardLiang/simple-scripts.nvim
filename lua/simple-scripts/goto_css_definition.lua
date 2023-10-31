@@ -1,7 +1,6 @@
 local function find_project_root()
 	local dir = vim.fn.expand("%:p:h")
 	while dir ~= "/" do
-		print(dir)
 		if vim.fn.filereadable(dir .. "/tsconfig.json") == 1 then
 			return dir
 		end
@@ -16,12 +15,11 @@ local function read_tsconfig()
 		return nil, "Could not find project root"
 	end
 
-	print(root_dir)
-
 	local f = io.open(root_dir .. "/tsconfig.json", "r")
 	print("f", f)
 	if f then
 		local content = f:read("*all")
+		print(content)
 		f:close()
 		local sanitized_content = content:gsub("//.-\n", "\n"):gsub("/%*.-%*/", "")
 		local ok, json_data = pcall(vim.fn.json_decode, sanitized_content)
