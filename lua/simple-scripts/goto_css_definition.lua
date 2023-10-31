@@ -83,7 +83,7 @@ local function find_full_expression(node)
 	while node do
 		local parent = node:parent()
 		print(parent:parent():parent():parent():type())
-		print(vim.treesitter.get_node_text(parent:parent():parent():parent(), 0))
+		print(vim.treesitter.get_node_text(parent:parent():parent(), 0))
 		if node:type() == "identifier" or node:type() == "type_identifier" then
 			node = parent
 		elseif parent and parent:type() == "member_expression" then
