@@ -35,6 +35,7 @@ local function find_import_of_object(object_name)
 			for child in node:iter_children() do
 				if child:type() == "import_specifier" then
 					local content = vim.treesitter.get_node_text(child, 0)
+					print(content)
 					if content == object_name then
 						for import_child in node:iter_children() do
 							if import_child:type() == "string" then
