@@ -66,10 +66,8 @@ local function find_import_of_object(object_name)
 	if tsconfig and tsconfig.compilerOptions and tsconfig.compilerOptions.paths then
 		local path = import_path:match("(.*[/\\])")
 		for alias, paths in pairs(tsconfig.compilerOptions.paths) do
-			print(alias, path)
 			if string.match(path, "^" .. alias:gsub("%*", ".*")) then
 				local actual_path = paths[1]:gsub("%*", import_path:match(alias:gsub("%*", "(.*)")))
-				print("actual_path", actual_path)
 				import_path = actual_path
 				break
 			end
@@ -135,7 +133,10 @@ local find_class_definition = function()
 	local filetype = vim.bo.filetype
 	if filetype == "typescriptreact" then
 		filetype = "typescript"
+	elseif filetype == "javascriptreact" then
+		filetype = "javascript"
 	end
+
 	local parser = vim.treesitter.get_parser(0, filetype)
 	local tree = parser:parse()[1]
 	local root = tree:root()
